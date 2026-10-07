@@ -1,3 +1,4 @@
+import authRoutes from "./routes/authRoutes.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -16,7 +17,7 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "ok", app: "Novella API" });
 });
 
-
+app.use("/api/auth", authRoutes);
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
