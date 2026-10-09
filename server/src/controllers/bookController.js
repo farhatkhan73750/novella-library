@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import Book from "../models/Book.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
+import ReadingProgress from "../models/ReadingProgress.js";
 
 const isString = (v) => typeof v === "string";
 
@@ -124,5 +125,6 @@ export const deleteBook = asyncHandler(async (req, res) => {
   checkId(req.params.id);
   const book = await Book.findByIdAndDelete(req.params.id);
   if (!book) throw new AppError("Book not found", 404);
+  await ReadingProgress.deleteMany({ book: book._id });
   res.json({ message: "Book deleted" });
 });

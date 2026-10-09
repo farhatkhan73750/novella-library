@@ -4,6 +4,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
+import readingRoutes from "./routes/readingRoutes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
+app.use("/api/reading", readingRoutes);
 
 
 app.use((req, res) => {

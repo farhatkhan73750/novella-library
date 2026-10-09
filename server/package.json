@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "seed": "node src/seed/seedBooks.js"
+    "seed": "node src/seed/seedBooks.js",
+    "seed:users": "node src/seed/seedUsers.js"
   },
   "keywords": [],
   "author": "",
