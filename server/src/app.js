@@ -5,13 +5,20 @@ import morgan from "morgan";
 import authRoutes from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import readingRoutes from "./routes/readingRoutes.js";
+import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 
 const app = express();
 
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL }));
-app.use(express.json());
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf; 
+    },
+  })
+);
 app.use(morgan("dev"));
 
 
@@ -22,6 +29,8 @@ app.get("/api/health", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/reading", readingRoutes);
+app.use("/api/subscriptions", subscriptionRoutes);
+
 
 
 app.use((req, res) => {

@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/AppError.js";
+import Subscription from "../models/Subscription.js";
 
 
 export const protect = asyncHandler(async (req, res, next) => {
@@ -24,7 +25,19 @@ export const protect = asyncHandler(async (req, res, next) => {
   if (!user) {
     throw new AppError("User no longer exists", 401);
   }
-
+    // Plan ended? Downgrade. (A subscriber with no end date has no expiry.)
+  if (
+    user.role === "subscriber" &&
+    user.subscriptionEndsAt &&
+    user.subscriptionEndsAt < new Date()
+  ) {
+    await User.updateOne({ _id: user._id }, { role: "user" });
+    await Subscription.updateMany(
+      { user: user._id, status: "active", endsAt: { $lt: new Date() } },
+      { status: "expired" }
+    );
+    user.role = "user";
+  }
   req.user = user; 
   next();
 });
