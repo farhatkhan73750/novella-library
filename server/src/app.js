@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import bookRoutes from "./routes/bookRoutes.js";
 import readingRoutes from "./routes/readingRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
+import recommendationRoutes from "./routes/recommendationRoutes.js";
 
 const app = express();
 
@@ -31,7 +32,7 @@ app.use("/api/books", bookRoutes);
 app.use("/api/reading", readingRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
 
-
+app.use("/api/recommendations", recommendationRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
