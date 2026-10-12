@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+/* Lets us switch dark mode by adding the class "dark" to the page.
+   We'll use this for the reader's dark mode later. */
+@custom-variant dark (&:where(.dark, .dark *));
