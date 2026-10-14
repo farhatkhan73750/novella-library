@@ -7,6 +7,7 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import Account from "./pages/Account.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import Catalogue from "./pages/Catalogue.jsx";
 
 export default function App() {
   return (
@@ -15,6 +16,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/books" element={<Catalogue />} />
 
         {/* Members only */}
         <Route element={<ProtectedRoute />}>

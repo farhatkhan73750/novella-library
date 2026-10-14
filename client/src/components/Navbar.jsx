@@ -7,9 +7,14 @@ export default function Navbar() {
   return (
     <header className="border-b border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800">
       <nav className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-        <Link to="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
-          Novella
-        </Link>
+        <div className="flex items-center gap-6">
+  <Link to="/" className="text-xl font-bold text-indigo-600 dark:text-indigo-400">
+    Novella
+  </Link>
+  <Link to="/books" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+    Books
+  </Link>
+</div>
 
         <div className="flex items-center gap-4 text-sm font-medium">
           {loading ? null : user ? (

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/client.js";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   // status can be: "checking", "online" or "offline"
@@ -39,6 +40,12 @@ export default function Home() {
       <p className="mt-3 text-slate-600 dark:text-slate-300">
         Read classic books and web novels, free or with a subscription.
       </p>
+      <Link
+  to="/books"
+  className="mt-6 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+>
+  Browse books
+</Link>
 
       <p className={`mt-8 inline-block rounded-full px-4 py-1 text-sm font-medium ${badge}`}>
         {status === "checking" && "Checking server..."}
