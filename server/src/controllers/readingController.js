@@ -57,16 +57,29 @@ export const readChapter = asyncHandler(async (req, res) => {
   }
 
   
+    // Fill in the bookmark fields
+  const applyProgress = (p) => {
+    if (!fullAccess) p.unlockedMonth = month;
+    p.lastChapter = chapterNumber;
+    p.furthestChapter = Math.max(p.furthestChapter, chapterNumber);
+    p.completed = p.completed || p.furthestChapter >= book.chapters.length;
+    p.lastReadAt = new Date();
+  };
+
   if (!progress) {
     progress = new ReadingProgress({ user: req.user._id, book: book._id });
   }
-  if (!fullAccess) progress.unlockedMonth = month;
-  progress.lastChapter = chapterNumber;
-  progress.furthestChapter = Math.max(progress.furthestChapter, chapterNumber);
-  progress.completed =
-    progress.completed || progress.furthestChapter >= book.chapters.length;
-  progress.lastReadAt = new Date();
-  await progress.save();
+  applyProgress(progress);
+
+  try {
+    await progress.save();
+  } catch (err) {
+    if (err.code !== 11000) throw err;
+    // Another request created the record at the same moment: update that one instead
+    progress = await ReadingProgress.findOne({ user: req.user._id, book: book._id });
+    applyProgress(progress);
+    await progress.save();
+  }
 
   res.json({
     book: {
