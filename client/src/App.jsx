@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound.jsx";
 import Catalogue from "./pages/Catalogue.jsx";
 import BookDetails from "./pages/BookDetails.jsx";
 import Reader from "./pages/Reader.jsx";
+import Plans from "./pages/Plans.jsx";
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/books" element={<Catalogue />} />
         <Route path="/books/:id" element={<BookDetails />} />
+        <Route path="/plans" element={<Plans />} />
 
         {/* Members only */}
         <Route element={<ProtectedRoute />}>

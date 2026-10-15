@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext.js";
 import { api, getToken, setToken, clearToken } from "../api/client.js";
 
@@ -53,9 +53,22 @@ export default function AuthProvider({ children }) {
     clearToken();
     setUser(null);
   };
+    
+  const refreshUser = useCallback(async () => {
+    try {
+      const data = await api("/auth/me");
+      setUser(data.user);
+    } catch (err) {
+      if (err.status === 401) {
+        clearToken();
+        setUser(null);
+      }
+      
+    }
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

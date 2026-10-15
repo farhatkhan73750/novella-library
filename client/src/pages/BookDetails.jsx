@@ -91,10 +91,13 @@ export default function BookDetails() {
       </Link>
     );
   } else if (isPremium && !hasFullAccess) {
-    action = (
-      <p className="rounded-lg bg-amber-100 px-4 py-3 text-sm text-amber-900">
-        This is a premium book. It's available to subscribers only.
-      </p>
+        action = (
+      <div className="rounded-lg bg-amber-100 px-4 py-3 text-sm text-amber-900">
+        <p>This is a premium book. It's available to subscribers only.</p>
+        <Link to="/plans" className="mt-1 inline-block font-medium underline">
+          See plans
+        </Link>
+      </div>
     );
   } else if (lastChapter) {
     action = (

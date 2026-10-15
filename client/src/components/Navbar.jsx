@@ -14,6 +14,9 @@ export default function Navbar() {
   <Link to="/books" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
     Books
   </Link>
+    <Link to="/plans" className="text-sm font-medium hover:text-indigo-600 dark:hover:text-indigo-400">
+    Plans
+  </Link>
 </div>
 
         <div className="flex items-center gap-4 text-sm font-medium">
