@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { api } from "../api/client.js";
 import { Link } from "react-router-dom";
+import { api } from "../api/client.js";
+import useAuth from "../context/useAuth.js";
+import ContinueReading from "../components/ContinueReading.jsx";
+import RecommendationsRow from "../components/RecommendationsRow.jsx";
 
 export default function Home() {
+  const { user } = useAuth();
+
   // status can be: "checking", "online" or "offline"
   const [status, setStatus] = useState("checking");
   const [message, setMessage] = useState("");
@@ -22,7 +27,6 @@ export default function Home() {
         setMessage(err.message);
       });
 
-    // Cleanup: if the page is left before the reply arrives, ignore the reply
     return () => {
       cancelled = true;
     };
@@ -35,23 +39,35 @@ export default function Home() {
   }[status];
 
   return (
-    <section className="text-center">
-      <h1 className="text-4xl font-bold">Welcome to Novella</h1>
-      <p className="mt-3 text-slate-600 dark:text-slate-300">
-        Read classic books and web novels, free or with a subscription.
-      </p>
-      <Link
-  to="/books"
-  className="mt-6 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
->
-  Browse books
-</Link>
+    <div>
+      <section className="text-center">
+        <h1 className="text-4xl font-bold">Welcome to Novella</h1>
+        <p className="mt-3 text-slate-600 dark:text-slate-300">
+          Read classic books and web novels, free or with a subscription.
+        </p>
+        <Link
+          to="/books"
+          className="mt-6 inline-block rounded-lg bg-indigo-600 px-5 py-2.5 font-medium text-white hover:bg-indigo-700"
+        >
+          Browse books
+        </Link>
+      </section>
 
-      <p className={`mt-8 inline-block rounded-full px-4 py-1 text-sm font-medium ${badge}`}>
-        {status === "checking" && "Checking server..."}
-        {status === "online" && `Server connected: ${message}`}
-        {status === "offline" && `Server offline: ${message}`}
+      {/* Members only: key= throws away old data if a different account logs in */}
+      {user && (
+        <div className="mt-12 space-y-12">
+          <ContinueReading key={`continue-${user.id}`} />
+          <RecommendationsRow key={`recs-${user.id}`} />
+        </div>
+      )}
+
+      <p className="mt-12 text-center">
+        <span className={`inline-block rounded-full px-4 py-1 text-sm font-medium ${badge}`}>
+          {status === "checking" && "Checking server..."}
+          {status === "online" && `Server connected: ${message}`}
+          {status === "offline" && `Server offline: ${message}`}
+        </span>
       </p>
-    </section>
+    </div>
   );
 }
