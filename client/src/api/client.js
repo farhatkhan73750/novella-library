@@ -1,5 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL;
 const TOKEN_KEY = "novella_token";
+export const UNAUTHORIZED_EVENT = "novella:unauthorized";
 
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY);
@@ -41,7 +42,14 @@ export async function api(path, { method = "GET", body, auth = true } = {}) {
     // no JSON body
   }
 
-  if (!response.ok) {
+    if (!response.ok) {
+    // The server says our token is no good (expired, tampered, user deleted).
+    // Only act if the token we sent is still the saved one, so a login that
+    // happened while this request was in flight is not wiped out.
+    if (response.status === 401 && auth && token && getToken() === token) {
+      clearToken();
+      window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+    }
     throw new ApiError(data?.message || "Something went wrong", response.status);
   }
   return data;

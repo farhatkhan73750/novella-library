@@ -7,22 +7,38 @@ import bookRoutes from "./routes/bookRoutes.js";
 import readingRoutes from "./routes/readingRoutes.js";
 import subscriptionRoutes from "./routes/subscriptionRoutes.js";
 import recommendationRoutes from "./routes/recommendationRoutes.js";
+import { apiLimiter } from "./middleware/rateLimiters.js";
+import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 const app = express();
 
+// Behind a hosting proxy (Render, Railway, ...) the real visitor IP arrives in a header.
+// Trust exactly one proxy in production, so rate limits count the visitor, not the proxy.
+if (process.env.NODE_ENV === "production") {
+  app.set("trust proxy", 1);
+}
 
+// CLIENT_URL may hold several addresses separated by commas
+const allowedOrigins = (process.env.CLIENT_URL || "")
+  .split(",")
+  .map((origin) => origin.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
+// ----- Middleware (order matters) -----
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL }));
+app.use(cors({ origin: allowedOrigins }));
+if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
+app.use("/api", apiLimiter); // before body parsing, so floods are rejected cheaply
 app.use(
   express.json({
+    limit: "1mb",
     verify: (req, res, buf) => {
-      req.rawBody = buf; 
+      req.rawBody = buf; // exact bytes, needed to check webhook signatures
     },
   })
 );
-if (process.env.NODE_ENV !== "test") app.use(morgan("dev"));
 
-
+// ----- Routes -----
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", app: "Novella API" });
 });
@@ -31,45 +47,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/books", bookRoutes);
 app.use("/api/reading", readingRoutes);
 app.use("/api/subscriptions", subscriptionRoutes);
-
 app.use("/api/recommendations", recommendationRoutes);
 
-app.use((req, res) => {
-  res.status(404).json({ message: "Route not found" });
-});
-
-
-app.use((err, req, res, next) => {
-  let statusCode = err.statusCode || 500;
-  let message = err.message || "Something went wrong";
-
-  
-  if (err.name === "ValidationError") {
-    statusCode = 400;
-    message = Object.values(err.errors).map((e) => e.message).join(", ");
-  }
-
-  
-  if (err.name === "CastError") {
-    statusCode = 400;
-    message = "Invalid value provided";
-  }
-
- 
-  if (err.type === "entity.parse.failed") {
-    statusCode = 400;
-    message = "Invalid JSON in request body";
-  }
-
-  
-  if (err.code === 11000) {
-    statusCode = 409;
-    message = "Duplicate value";
-  }
-
-  if (statusCode === 500) console.error(err.stack);
-
-  res.status(statusCode).json({ message });
-});
+// ----- Last: 404, then errors -----
+app.use(notFound);
+app.use(errorHandler);
 
 export default app;

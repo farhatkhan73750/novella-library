@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext.js";
-import { api, getToken, setToken, clearToken } from "../api/client.js";
+import { api, getToken, setToken, clearToken, UNAUTHORIZED_EVENT } from "../api/client.js";
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -28,7 +28,12 @@ export default function AuthProvider({ children }) {
       cancelled = true;
     };
   }, []);
-
+    // If any API call discovers the token is no longer valid, sign out everywhere
+  useEffect(() => {
+    const onUnauthorized = () => setUser(null);
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+  }, []);
   const login = async (email, password) => {
     const data = await api("/auth/login", {
       method: "POST",
