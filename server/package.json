@@ -16,7 +16,8 @@
     "seed": "node src/seed/seedBooks.js",
     "seed:users": "node src/seed/seedUsers.js",
     "seed:history": "node src/seed/seedHistory.js",
-    "eval:recs": "node src/seed/evaluateRecommender.js"
+    "eval:recs": "node src/seed/evaluateRecommender.js",
+    "seed:gutenberg": "node src/seed/seedGutenberg.js"
   },
   "keywords": [],
   "author": "",
